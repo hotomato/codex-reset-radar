@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="根据公开排期、已确认重置和服务状态，查看未来 48 小时 Codex 全局重置的线索。">
+    <meta name="theme-color" content="#101b24">
+    <title>Codex 重置雷达 · 公开信号预测</title>
+    <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+    <link rel="stylesheet" href="./assets/styles.css">
+    <script type="module" src="./assets/app.mjs"></script>
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="site-header">
+        <a class="brand" href="./" aria-label="Codex 重置雷达首页">
+          <span class="brand-mark" aria-hidden="true"><span></span></span>
+          <span>Codex <strong>重置雷达</strong></span>
+        </a>
+        <div class="header-actions">
+          <span class="unofficial">独立项目 · 非官方</span>
+          <a class="text-link" href="#method">计算方法 <span aria-hidden="true">↗</span></a>
+        </div>
+      </header>
+
+      <main>
+        <div class="intro-row">
+          <div>
+            <p class="eyebrow">PUBLIC SIGNAL / 公开信号</p>
+            <h1>下一次全局重置，<br><em>有迹可循吗？</em></h1>
+            <p class="intro-copy">汇总公开排期与服务动态，观察未来 48 小时的 Codex 全局重置信号。</p>
+          </div>
+          <div class="update-control">
+            <span class="update-label"><span class="status-dot" id="status-dot"></span><span id="data-status">正在读取数据…</span></span>
+            <button type="button" id="refresh-button" class="refresh-button" aria-label="重新读取最新数据">↻ <span>刷新数据</span></button>
+          </div>
+        </div>
+
+        <div class="stale-banner" id="stale-banner" hidden role="status">
+          当前快照已超过 6 小时。下面保留最后一次结果，请以来源页面为准。
+        </div>
+        <div class="error-banner" id="error-banner" hidden role="alert">
+          数据读取失败。请稍后刷新页面。
+        </div>
+
+        <section class="hero-grid" aria-label="48 小时预测">
+          <div class="forecast-panel panel">
+            <div class="panel-topline">
+              <span class="section-kicker">01 / 48 小时观察</span>
+              <span class="tiny-pill" id="forecast-tag">载入中</span>
+            </div>
+            <div class="forecast-main">
+              <div class="forecast-wording" aria-live="polite">
+                <p class="small-label">当前判断</p>
+                <h2 id="forecast-headline">正在分析公开信号</h2>
+                <p id="forecast-detail">预测依据将在数据载入后显示。</p>
+              </div>
+              <div class="score-gauge" id="score-gauge" style="--score: 0" role="img" aria-label="线索指数暂不可用">
+                <div class="score-inner">
+                  <strong id="score-value">—</strong>
+                  <span>线索指数 / 100</span>
+                </div>
+              </div>
+            </div>
+            <div class="forecast-foot">
+              <span class="foot-mark" aria-hidden="true">↗</span>
+              <p>指数表示公开线索强弱，<strong>不是发生概率</strong>。没有公告时，历史间隔不会自动让重置“更该发生”。</p>
+            </div>
+          </div>
+
+          <div class="evidence-panel panel">
+            <div class="panel-topline">
+              <span class="section-kicker">02 / 判断依据</span>
+              <span class="side-count" id="evidence-count">— 条</span>
+            </div>
+            <div id="evidence-list" class="evidence-list" aria-live="polite">
+              <p class="empty-note">正在整理信号…</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="facts-grid" aria-label="关键状态">
+          <article class="fact-card panel">
+            <div class="fact-icon calendar-icon" aria-hidden="true">◷</div>
+            <div>
+              <p class="small-label">公开排期</p>
+              <h3 id="schedule-value">读取中</h3>
+              <p id="schedule-detail">—</p>
+            </div>
+          </article>
+          <article class="fact-card panel">
+            <div class="fact-icon reset-icon" aria-hidden="true">↺</div>
+            <div>
+              <p class="small-label">最近确认的全局重置</p>
+              <h3 id="last-reset-value">读取中</h3>
+              <p id="last-reset-detail">—</p>
+            </div>
+          </article>
+          <article class="fact-card panel">
+            <div class="fact-icon status-icon" aria-hidden="true">●</div>
+            <div>
+              <p class="small-label">OpenAI 服务状态</p>
+              <h3 id="service-value">读取中</h3>
+              <p id="service-detail">—</p>
+            </div>
+          </article>
+        </section>
+
+        <section class="lower-grid">
+          <div class="history-panel panel">
+            <div class="section-heading">
+              <div>
+                <span class="section-kicker">03 / 公开记录</span>
+                <h2>最近的重置信号</h2>
+              </div>
+              <a href="https://didcodexreset.com/zh/history.html" target="_blank" rel="noopener noreferrer">查看来源记录 ↗</a>
+            </div>
+            <div id="history-list" class="history-list"><p class="empty-note">正在读取记录…</p></div>
+          </div>
+
+          <aside class="method-panel panel" id="method">
+            <span class="section-kicker">04 / 计算方法</span>
+            <h2>分数怎么来的？</h2>
+            <p>这是一个可复核的规则分数，适合观察公开线索；没有历史校准，因此不把分数写成“概率”。</p>
+            <div class="method-table" aria-label="线索指数规则">
+              <div><span>无公开排期</span><strong>10 分起</strong></div>
+              <div><span>明确公开排期</span><strong>80 分起</strong></div>
+              <div><span>推断出的排期</span><strong>65 分起</strong></div>
+              <div><span>排期精确到时刻</span><strong>+8 分</strong></div>
+              <div><span>排期跨度超 72 小时</span><strong>−5 分</strong></div>
+              <div><span>近 48 小时已重置</span><strong>−6 分*</strong></div>
+              <div><span>相关服务事件未解决</span><strong>+5 分*</strong></div>
+            </div>
+            <p class="method-note">* 仅在没有公开排期时计入。服务故障和临时重置没有确定的因果关系。</p>
+            <div class="model-trace">
+              <strong>本次计算</strong>
+              <ul id="reason-list"><li>等待数据。</li></ul>
+            </div>
+          </aside>
+        </section>
+
+        <div class="source-note">
+          <span class="source-note-icon" aria-hidden="true">i</span>
+          <p>本工具只追踪临时的全局重置。个人账号的 5 小时及每周额度、重置时间，请查看 <a href="https://chatgpt.com/codex/settings/usage" target="_blank" rel="noopener noreferrer">Codex 用量页面 ↗</a>；不同账号可能不同。</p>
+        </div>
+      </main>
+
+      <footer>
+        <span>Codex 重置雷达 · 独立开源项目，与 OpenAI 无关联</span>
+        <div>
+          <a href="https://didcodexreset.com/zh/api.html" target="_blank" rel="noopener noreferrer">信号数据</a>
+          <a href="https://status.openai.com/" target="_blank" rel="noopener noreferrer">服务状态</a>
+          <a href="https://learn.chatgpt.com/docs/pricing" target="_blank" rel="noopener noreferrer">官方用量说明</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+</html>
