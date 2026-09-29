@@ -59,6 +59,10 @@ function sourceLink(url, label) {
 
 function setText(id, value) { el(id).textContent = value; }
 
+function serviceDescription(value) {
+  return value === "All Systems Operational" ? "所有服务运行正常" : value ?? "未知";
+}
+
 function addEvidence(list, { title, detail, icon, color = "neutral", linkUrl, linkLabel }) {
   const item = document.createElement("article");
   item.className = "evidence-item";
@@ -111,7 +115,7 @@ function renderEvidence(result, snapshot) {
   } else {
     addEvidence(list, {
       title: "暂无未解决的相关服务事件",
-      detail: `OpenAI 状态：${snapshot.status?.description ?? "未知"}。服务状态仅作为背景信息。`,
+      detail: `OpenAI 状态：${serviceDescription(snapshot.status?.description)}。服务状态仅作为背景信息。`,
       icon: "●", linkUrl: "https://status.openai.com/", linkLabel: "查看状态页 ↗",
     });
   }
@@ -149,7 +153,7 @@ function renderHistory(snapshot) {
     const title = document.createElement("h3");
     title.textContent = recordTitle(record);
     const description = document.createElement("p");
-    const summary = (record.text ?? "无公开摘要").replace(/\s+/g, " ").trim();
+    const summary = (record.text ?? "").replace(/\s+/g, " ").trim() || "暂无公开摘要";
     description.textContent = summary.length > 125 ? `${summary.slice(0, 125)}…` : summary;
     body.append(title, description);
     const link = sourceLink(record.source?.url, " 原帖 ↗");
@@ -179,7 +183,7 @@ function renderFacts(result, snapshot) {
     ? (last.scope?.plans?.includes("all") ? "记录标注：全部套餐" : "具体适用范围请查看来源")
     : "无法据此推算下一次重置");
   const indicator = snapshot.status?.indicator;
-  setText("service-value", indicator === "none" ? "运行正常" : snapshot.status?.description ?? "状态未知");
+  setText("service-value", indicator === "none" ? "运行正常" : serviceDescription(snapshot.status?.description));
   setText("service-detail", result.activeIncidents.length > 0
     ? `${result.activeIncidents.length} 条相关事件未解决`
     : "官方状态页 · 仅供参考");
